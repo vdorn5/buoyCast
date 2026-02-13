@@ -82,7 +82,7 @@ def clean_ndbc_data(raw_df: pd.DataFrame, buoy_id: str) -> pd.DataFrame:
     df["wind_speed_ms"] = df["wind_speed"] * 0.514444
     df["wave_energy"] = (df["wave_height"] ** 2) * df["dominant_wave_period"]
 
-    # Add buoy column
-    df["buoy"] = buoy_id
+    # Move timestamp and station_id
+    df = df.reset_index()
 
     return df
