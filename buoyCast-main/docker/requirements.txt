@@ -1,8 +1,0 @@
-numpy
-scipy
-torch
-xarray
-matplotlib
-jupyter
-dask
-tensorboard

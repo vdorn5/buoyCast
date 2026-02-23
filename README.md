@@ -1,99 +1,56 @@
-# buoyCast
+# buoyCast (AAI-540 MLOps)
 
-[![CI](https://github.com/vdorn5/buoyCast/actions/workflows/docker-build.yml/badge.svg)](https://github.com/vdorn5/buoyCast/actions/workflows/docker-build.yml)
+This repository is set up as a **full-cycle SageMaker MLOps project** for wind-driven wave forecasting from **NOAA NDBC buoy data**.
 
-Wind-Driven Wave Forecasting with Physics-Informed Machine Learning
+**Goal (ML problem):** predict a physics-safe wave-energy proxy:
 
-## Overview
+- **E\_star = Hs²** (non-negative)
+- and report wave-height proxy **Hs = sqrt(E\_star)** for stakeholder-friendly metrics
 
-buoyCast is a project that develops physics-informed machine learning models for predicting wind-driven ocean wave characteristics, such as wave heights, periods, and directions. By integrating physical wave dynamics with ML techniques, the project ensures predictions respect conservation laws and physical constraints, making it suitable for oceanographic applications where labeled data is scarce.
+## What “full cycle” means here
 
-Key features:
-- **Physics-Integrated ML**: Uses Physics-Informed Neural Networks (PINNs) to enforce physical laws during training.
-- **Data Handling**: Processes buoy measurements and meteorological wind fields using xarray for efficient geospatial operations.
-- **Scalable Training**: Supports GPU acceleration via PyTorch and CUDA.
-- **Modular Architecture**: Organized into data processing, physics engines, ML algorithms, and evaluation components.
+From scratch in SageMaker you can run:
 
-## Installation
+1. **Live data gathering** (NOAA NDBC) → curated data in **S3** (no backup data required)
+2. **Data engineering** → optional Athena external table over curated Parquet
+3. **Feature engineering** → supervised lag features
+4. **Feature Store** → Feature Group creation + ingestion (offline + optional online)
+5. **SageMaker Pipeline (DAG)** → preprocess → train → evaluate → conditional register
+6. **Model Registry** → Model Package Group + model versioning
+7. **Deployment** → real-time endpoint + invocation output
+8. **Monitoring** → CloudWatch dashboard + Model Monitor baseline/schedule
+9. **CI** → GitHub Actions (lint + tests) for a “CI/CD DAG” demo
 
-### Prerequisites
-- Docker and Docker Compose
-- NVIDIA GPU with drivers (for GPU acceleration; optional for CPU-only runs)
+## Notebook run order (SageMaker Studio)
 
-### Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/vdorn5/buoyCast.git
-   cd buoyCast
-   ```
+Run these notebooks in order:
 
-2. Build and start the development environment:
-   ```bash
-   docker-compose up -d
-   ```
+- `notebooks/01_data_gathering_etl.ipynb`
+- `notebooks/02_athena_curated_table.ipynb` (optional but good for the Design Doc)
+- `notebooks/03_feature_store_ingest.ipynb`
+- `notebooks/04_sagemaker_pipeline_train_register.ipynb`
+- `notebooks/05_deploy_endpoint_monitor.ipynb`
+- `notebooks/99_cleanup_resources.ipynb` (recommended to avoid endpoint costs)
 
-3. Enter the container:
-   ```bash
-   docker-compose exec buoycast bash
-   ```
+## Local / dev install
 
-Dependencies are automatically installed from `requirements.txt` during the Docker build.
-
-## Usage
-
-### Development Workflow
-- **Prototyping**: Use Jupyter notebooks in `notebooks/` for data exploration and model development.
-- **Training**: Run scripts in `src/algorithms/` for model training.
-- **Evaluation**: Use scripts in `tests/` or `src/algorithms/` to evaluate against buoy data.
-
-Example: To run a training script (inside the container):
 ```bash
-python src/algorithms/train.py
+pip install -r requirements.txt
+pytest -q
+ruff check src tests
 ```
 
-### Running Notebooks
-Notebooks can be executed for testing or exploration:
-```bash
-jupyter notebook notebooks/
-```
+## Repo layout (what matters for MLOps)
 
-## Project Structure
+- `src/` — reusable library code (cleaning, feature engineering, physics guardrails)
+- `notebooks/` — the “operator runbook” for SageMaker Studio
+- `sagemaker_scripts/` — scripts used by **Processing**, **Training**, and **Inference**
+- `pipelines/` — SageMaker Pipeline (DAG) definition
+- `.github/workflows/` — GitHub Actions CI (lint + tests, docker build)
 
-```
-buoyCast/
-├── .github/
-│   ├── copilot-instructions.md  # AI coding guidelines
-│   └── workflows/               # CI/CD pipelines
-├── docker/                      # Docker setup
-├── src/                         # Source code
-│   ├── algorithms/              # ML models and training
-│   ├── data/                    # Data processing
-│   ├── physics/                 # Physics equations
-│   └── utils/                   # Shared utilities
-├── notebooks/                   # Jupyter notebooks
-├── data/                        # Datasets
-├── models/                      # Saved weights
-├── tests/                       # Unit tests
-├── requirements.txt             # Python dependencies
-├── docker-compose.yml           # Docker orchestration
-└── README.md
-```
+---
 
-## Contributing
+## Original project background
 
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature/your-feature`.
-3. Make changes and add tests.
-4. Run tests: `pytest` (inside the container).
-5. Submit a pull request.
-
-Please ensure code follows PEP 8 and includes physics validation for ML outputs.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Built with PyTorch, xarray, and other open-source tools.
-- Inspired by advancements in physics-informed machine learning for environmental modeling.
+The original buoyCast concept is “Wind-Driven Wave Forecasting with Physics-Informed ML”.
+This AAI-540 version focuses on the **MLOps system** and operability in SageMaker.

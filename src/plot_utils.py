@@ -1,38 +1,37 @@
-# plot_utils.py
+"""Plot helpers."""
+
+from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 def plot_ndbc_histograms(df: pd.DataFrame, bins: int = 60) -> None:
-    """
-    Visual QC check: histograms of NDBC buoy data columns.
-    
+    """Visual QC: histograms of key NDBC buoy variables.
+
     Plots distributions for:
-      - WVHT: Significant Wave Height [m]
-      - DPD: Dominant Wave Period [s]
-      - WSPD: Wind Speed [m/s]
-      - MWD: Mean Wave Direction [deg]
-      - WDIR: Wind Direction [deg]
+      - wave_height: Significant Wave Height Hs [m]
+      - dominant_wave_period: Dominant Wave Period Tp [s]
+      - wind_speed: Wind Speed [knots] (or whatever your cleaned units are)
+      - mean_wave_direction: Mean Wave Direction [deg]
+      - wind_direction: Wind Direction [deg]
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Cleaned NDBC data with columns: ['WVHT', 'DPD', 'WSPD', 'MWD', 'WDIR'].
-    bins : int, default=60
+    df:
+        Cleaned NDBC dataframe.
+    bins:
         Number of histogram bins.
-
-    Returns
-    -------
-    None
     """
+
     fig, axs = plt.subplots(2, 3, figsize=(16, 8))
     axs = axs.flatten()
 
     plots = [
         ("wave_height", "Significant Wave Height Hs [m]"),
-        ("dominant_wave_period",  "Dominant Wave Period Tp [s]"),
-        ("wind_speed", "Wind Speed [m/s]"),
-        ("mean_wave_direction",  "Mean Wave Direction [deg]"),
+        ("dominant_wave_period", "Dominant Wave Period Tp [s]"),
+        ("wind_speed", "Wind Speed"),
+        ("mean_wave_direction", "Mean Wave Direction [deg]"),
         ("wind_direction", "Wind Direction [deg]"),
     ]
 
@@ -43,4 +42,12 @@ def plot_ndbc_histograms(df: pd.DataFrame, bins: int = 60) -> None:
             ax.set_ylabel("PDF")
             ax.grid(True)
         else:
-            ax.text(0.5, 0.5, f"{col} not in DataFrame")
+            ax.text(0.5, 0.5, f"{col} not in DataFrame", ha="center", va="center")
+            ax.axis("off")
+
+    # Turn off any unused subplots (e.g., the 6th panel).
+    for ax in axs[len(plots) :]:
+        ax.axis("off")
+
+    fig.tight_layout()
+    plt.show()
