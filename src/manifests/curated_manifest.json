@@ -1,0 +1,33 @@
+{
+  "created_utc": "2026-02-21T02:45:47Z",
+  "bucket": "sagemaker-us-east-1-318401170150",
+  "region": "us-east-1",
+  "S3_PREFIX_PARQUET": "curated/ndbc_parquet",
+  "S3_PREFIX_CSV": "curated/ndbc_csv",
+  "start_date": "2023-01-01",
+  "end_date": "2026-02-01",
+  "buoy_ids": [
+    "46086",
+    "46042",
+    "46011"
+  ],
+  "row_counts": {
+    "46086": 51531,
+    "46042": 12571,
+    "46011": 53530
+  },
+  "artifacts": {
+    "46086": {
+      "parquet": "s3://sagemaker-us-east-1-318401170150/curated/ndbc_parquet/buoy=46086/stdmet.parquet",
+      "csv": "s3://sagemaker-us-east-1-318401170150/curated/ndbc_csv/buoy=46086/stdmet.csv"
+    },
+    "46042": {
+      "parquet": "s3://sagemaker-us-east-1-318401170150/curated/ndbc_parquet/buoy=46042/stdmet.parquet",
+      "csv": "s3://sagemaker-us-east-1-318401170150/curated/ndbc_csv/buoy=46042/stdmet.csv"
+    },
+    "46011": {
+      "parquet": "s3://sagemaker-us-east-1-318401170150/curated/ndbc_parquet/buoy=46011/stdmet.parquet",
+      "csv": "s3://sagemaker-us-east-1-318401170150/curated/ndbc_csv/buoy=46011/stdmet.csv"
+    }
+  }
+}
